@@ -43,10 +43,6 @@ kotlin {
                 implementation(devNpm("@babel/cli", "^7.14.0"))
                 implementation(devNpm("@babel/preset-env", "^7.14.0"))
 
-//                implementation(npm("@babel/plugin-transform-runtime", "^7.14.0"))
-//                implementation(npm("@babel/plugin-proposal-class-properties", "^7.14.0"))
-//                implementation(npm("@babel/plugin-transform-arrow-functions", "^7.14.0"))
-
                 // Webpack dependencies
                 implementation(devNpm("webpack", "^5.0.0"))
                 implementation(devNpm("webpack-cli", "^4.0.0"))

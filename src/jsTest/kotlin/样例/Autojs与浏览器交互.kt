@@ -2,7 +2,6 @@ package 样例
 
 import lib.kotlin.HtmlLoader
 import lib.module.log
-import test0
 
 /**
  *
