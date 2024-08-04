@@ -40,6 +40,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-/gradle/
 /.idea/
 /kotlin-js-store/
