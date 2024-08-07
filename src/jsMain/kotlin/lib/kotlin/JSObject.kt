@@ -10,26 +10,65 @@ import kotlin.reflect.KClass
  */
 @JsName("Object")
 external object JSObject {
+    @JsName("assign")
     fun assign(target: dynamic, vararg sources: dynamic): dynamic
+
+    @JsName("create")
     fun create(proto: dynamic, propertiesObject: dynamic): dynamic
+
+    @JsName("create")
     fun create(proto: dynamic): dynamic
+
+    @JsName("defineProperty")
     fun defineProperty(obj: dynamic, prop: String, descriptor: dynamic): dynamic
+
+    @JsName("defineProperties")
     fun defineProperties(obj: dynamic, properties: dynamic): dynamic
     fun entries(obj: dynamic): dynamic
+
+    @JsName("freeze")
     fun freeze(obj: dynamic): dynamic
+
+    @JsName("fromEntries")
     fun fromEntries(iterable: dynamic): dynamic
+
+    @JsName("getOwnPropertyDescriptor")
     fun getOwnPropertyDescriptor(obj: dynamic, prop: String): dynamic
+
+    @JsName("getOwnPropertyDescriptors")
     fun getOwnPropertyDescriptors(obj: dynamic): dynamic
+
+    @JsName("getOwnPropertyNames")
     fun getOwnPropertyNames(obj: dynamic): dynamic
+
+    @JsName("getOwnPropertySymbols")
     fun getOwnPropertySymbols(obj: dynamic): dynamic
+
+    @JsName("getPrototypeOf")
     fun getPrototypeOf(obj: dynamic): dynamic
+
+    @JsName("is")
     fun Is(value1: dynamic, value2: dynamic): Boolean
+
+    @JsName("isExtensible")
     fun isExtensible(obj: dynamic): Boolean
+
+    @JsName("isFrozen")
     fun isFrozen(obj: dynamic): Boolean
+
+    @JsName("isSealed")
     fun isSealed(obj: dynamic): Boolean
+
+    @JsName("keys")
     fun keys(obj: dynamic): Array<String>
+
+    @JsName("setPrototypeOf")
     fun setPrototypeOf(obj: dynamic, proto: dynamic): dynamic
+
+    @JsName("values")
     fun values(obj: dynamic): Array<dynamic>
+
+    @JsName("seal")
     fun seal(obj: dynamic): dynamic
 }
 
@@ -196,5 +235,5 @@ fun JavaAdapterByKotlin(fullyQualifiedName: String, javascriptObject: Any): Java
 }
 
 fun JavaAdapterByKotlin(fullyQualifiedName: String, interfaces: Array<String>, javascriptObject: Any): JavaAdapter {
-    return JavaAdapter(JavaClass.getJavaAdapter(fullyQualifiedName),interfaces, javascriptObject)
+    return JavaAdapter(JavaClass.getJavaAdapter(fullyQualifiedName), interfaces, javascriptObject)
 }

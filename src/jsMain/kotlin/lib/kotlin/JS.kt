@@ -6,6 +6,7 @@ import lib.module.open
  * 加载并执行 JS 文件
  * 请将 JS 文件放置于 resources 下
  */
+@JsName("loadJsFile")
 fun loadJsFile(name: String) {
     val file = open(name, "r")
     val fileContent = file.read()
@@ -35,4 +36,8 @@ fun loadJsFile(name: String) {
  * 使用  @JsExport 可以导出
  * 使用  @JsModule 声明模块
  */
+@JsName("require")
 external fun require(path: String): dynamic
+
+@JsName("context")
+external val context:dynamic
