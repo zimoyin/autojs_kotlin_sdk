@@ -16,7 +16,7 @@ plugins {
 
 
 group = "com.github.autojs_kotlin_sdk"
-version = "2.0"
+version = "2.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -49,23 +49,6 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                // Babel dependencies (不使用 webpage 命令可以移除)
-                implementation(devNpm("babel-loader", "^8.1.0"))
-                implementation(devNpm("@babel/core", "^7.14.0"))
-                implementation(devNpm("@babel/cli", "^7.14.0"))
-                implementation(devNpm("@babel/preset-env", "^7.14.0"))
-
-                // Webpack dependencies (不使用 webpage 命令可以移除)
-                implementation(devNpm("webpack", "^5.0.0"))
-                implementation(devNpm("webpack-cli", "^4.0.0"))
-
-                // javascript-obfuscator (不使用 webpage 命令可以移除)
-                implementation(devNpm("javascript-obfuscator", "^4.1.1"))
-                implementation(devNpm("webpack-obfuscator", "^3.5.1"))
-
-
-                // Kotlin dependencies
-                // Coroutines & serialization (不使用可以移除)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
             }
@@ -283,7 +266,7 @@ fun KotlinJsTargetDsl.taskList() {
         dependsOn("jsProductionExecutableCompileSync")
         dependsOn("compileProductionExecutableKotlinJs")
 
-        intermediateCompilationFile.deleteDirectoryContents()
+        if(intermediateCompilationMainJsFile.exists()) intermediateCompilationFile.deleteDirectoryContents()
 
         doLast{
             copy {
