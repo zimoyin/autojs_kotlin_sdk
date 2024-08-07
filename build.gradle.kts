@@ -11,17 +11,15 @@ var serverPort = 9317
 plugins {
     kotlin("multiplatform") version "2.0.0"
     kotlin("plugin.serialization") version "2.0.0"
+    id("maven-publish")
 }
 
 
-group = "zimoyin.github"
-version = "1.0-SNAPSHOT"
+group = "com.github.autojs_kotlin_sdk"
+version = "2.0"
 
 repositories {
     mavenCentral()
-    maven {
-        url = URI("https://jitpack.io")
-    }
 }
 
 kotlin {
@@ -70,8 +68,6 @@ kotlin {
                 // Coroutines & serialization (不使用可以移除)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-                // 不可移除!
-                implementation("com.github.zimoyin:autojs_kotlin_sdk:1.0.6")
             }
         }
     }
@@ -331,4 +327,15 @@ fun post(url:String,data:String){
     }
 
     connection.disconnect()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["kotlin"])
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+        }
+    }
 }
