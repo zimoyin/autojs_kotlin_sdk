@@ -29,7 +29,7 @@ kotlin {
             rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = true
         }
         // 输出模块名称
-        moduleName = "main"
+//        moduleName = "main"
         // 设置package.json
         compilations["main"].packageJson {
             customField("scripts", mapOf("babel" to "babel kotlin -d kotlin_babel", "build" to "webpack"))
@@ -64,8 +64,8 @@ fun KotlinJsTargetDsl.taskList() {
     val configFile = buildFile.parentFile.resolve("config")                         // 配置文件夹
     val compilationFile = buildFile.parentFile.resolve("build/autojs/compilation") // 最后编译输出文件夹
     val intermediateCompilationFile =  buildFile.parentFile.resolve("build/autojs/intermediate_compilation_files") // 最后中间编译输出文件夹
-    val intermediateCompilationMainJsFile =  File(intermediateCompilationFile, "main.js") // 最后中间编译输出文件夹
-    val compilationMainJsFile =  File(compilationFile, "main.js")                                    // 输出最后编译文件
+    val intermediateCompilationMainJsFile =  File(intermediateCompilationFile, "kotlin_autojs_lib.js") // 最后中间编译输出文件夹
+    val compilationMainJsFile =  File(compilationFile, "kotlin_autojs_lib.js")                                    // 输出最后编译文件
 
     val webpackIntermediateFiles = project.findProperty("autojs.webpack.intermediate.files") as String
     val useUI = project.findProperty("autojs.use.ui") as String
