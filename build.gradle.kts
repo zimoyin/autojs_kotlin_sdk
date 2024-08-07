@@ -29,7 +29,7 @@ kotlin {
             rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = true
         }
         // 输出模块名称
-//        moduleName = "main"
+        moduleName = "autojs_kotlin_sdk"
         // 设置package.json
         compilations["main"].packageJson {
             customField("scripts", mapOf("babel" to "babel kotlin -d kotlin_babel", "build" to "webpack"))
