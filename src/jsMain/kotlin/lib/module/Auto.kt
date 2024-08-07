@@ -4,7 +4,7 @@ package lib.module
 external object Auto {
 
     /**
-     * 等待某些条件满足。
+     * 检查无障碍服务是否已经启用，如果没有启用则跳转到无障碍服务启用界面，并等待无障碍服务启动；当无障碍服务启动后脚本会继续运行。
      */
     fun waitFor()
 

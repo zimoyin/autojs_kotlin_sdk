@@ -15,6 +15,7 @@ import lib.packages.ex.android.WebViewClientListener
  */
 class HtmlLoader @Deprecated("use HtmlLoader.create()") constructor(
     val index: String,
+    val config: HtmlLoaderBuilder.Config,
     private val webViewClientListener: WebViewClientListener,
     private val webChromeClientListener: WebChromeClientListener,
 ) {
@@ -26,9 +27,63 @@ class HtmlLoader @Deprecated("use HtmlLoader.create()") constructor(
     }
 
     @JsName("webViewInit")
-    private fun webViewInit(webView: UI.WebView) {
+    private fun webViewInit(webView: UILib.WebView) {
+        setConfig(webView)
         webView.webViewClient = JavaAdapterByKotlin("android.webkit.WebViewClient", webViewClientListener)
         webView.webChromeClient = JavaAdapterByKotlin("android.webkit.WebChromeClient", webChromeClientListener)
+    }
+
+    private fun setConfig(webView: UILib.WebView) {
+        config.apply {
+             webView.getSettings().setSupportZoom(supportZoom)
+             webView.getSettings().setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture)
+             webView.getSettings().setBuiltInZoomControls(builtInZoomControls)
+             webView.getSettings().setDisplayZoomControls(displayZoomControls)
+             webView.getSettings().setAllowFileAccess(allowFileAccess)
+             webView.getSettings().setAllowContentAccess(allowContentAccess)
+             webView.getSettings().setLoadWithOverviewMode(loadWithOverviewMode)
+             webView.getSettings().setSaveFormData(saveFormData)
+             webView.getSettings().setTextZoom(textZoom)
+//             webView.getSettings().setAcceptThirdPartyCookies(acceptThirdPartyCookies)
+             webView.getSettings().setUseWideViewPort(useWideViewPort)
+             webView.getSettings().setSupportMultipleWindows(supportMultipleWindows)
+             webView.getSettings().setStandardFontFamily(standardFontFamily)
+             webView.getSettings().setFixedFontFamily(fixedFontFamily)
+             webView.getSettings().setSansSerifFontFamily(sansSerifFontFamily)
+             webView.getSettings().setSerifFontFamily(serifFontFamily)
+             webView.getSettings().setCursiveFontFamily(cursiveFontFamily)
+             webView.getSettings().setFantasyFontFamily(fantasyFontFamily)
+             webView.getSettings().setMinimumFontSize(minimumFontSize)
+             webView.getSettings().setMinimumLogicalFontSize(minimumLogicalFontSize)
+             webView.getSettings().setDefaultFontSize(defaultFontSize)
+             webView.getSettings().setDefaultFixedFontSize(defaultFixedFontSize)
+             webView.getSettings().setLoadsImagesAutomatically(loadImagesAutomatically)
+             webView.getSettings().setBlockNetworkImage(blockNetworkImage)
+             webView.getSettings().setBlockNetworkLoads(blockNetworkLoads)
+             webView.getSettings().setJavaScriptEnabled(javaScriptEnabled)
+             webView.getSettings().setAllowUniversalAccessFromFileURLs(allowUniversalAccessFromFileURLs)
+             webView.getSettings().setAllowFileAccessFromFileURLs(allowFileAccessFromFileURLs)
+             webView.getSettings().setGeolocationEnabled(geolocationEnabled)
+             webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(javaScriptCanOpenWindowsAutomatically)
+             webView.getSettings().setDefaultTextEncodingName(defaultTextEncodingName)
+             webView.getSettings().setNeedInitialFocus(needInitialFocus)
+             webView.getSettings().setCacheMode(cacheMode)
+             webView.getSettings().setMixedContentMode(mixedContentMode)
+
+            // 设置数据库路径和缓存路径
+             webView.getSettings().databasePath = databasePath
+             webView.getSettings().appCachePath = appCachePath
+
+            // 启用或禁用数据库和缓存功能
+             webView.getSettings().setDatabaseEnabled(databaseEnabled)
+             webView.getSettings().setAppCacheEnabled(appCacheEnabled)
+             webView.getSettings().setDomStorageEnabled(domStorageEnabled)
+
+            // 设置用户代理字符串
+            if (userAgentString != null) {
+                 webView.getSettings().setUserAgentString(userAgentString)
+            }
+        }
     }
 
 
@@ -79,7 +134,7 @@ class HtmlLoader @Deprecated("use HtmlLoader.create()") constructor(
          * 在浏览器执行JS
          */
         @JsName("callJavaScript")
-        fun callJavaScript(webViewWidget: UI.WebView, script: String, callback: ((data: dynamic) -> Unit)? = null) {
+        fun callJavaScript(webViewWidget: UILib.WebView, script: String, callback: ((data: dynamic) -> Unit)? = null) {
             try {
                 webViewWidget.evaluateJavascript(
                     "javascript:$script",

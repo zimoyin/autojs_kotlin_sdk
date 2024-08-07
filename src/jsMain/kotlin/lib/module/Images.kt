@@ -271,7 +271,9 @@ external object Images {
      *
      */
     fun save(image: Image, path: String, format: String, quality: Int)
+    fun saveImage(image: Image, path: String, format: String, quality: Int)
     fun save(image: Image, path: String)
+    fun saveImage(image: Image, path: String)
 
     /**
      * 复制一张图片并返回新的副本。该函数会完全复制img对象的数据。

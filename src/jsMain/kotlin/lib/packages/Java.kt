@@ -11,6 +11,20 @@ external class java {
     @JsName("net")
     class net {
 
+        @JsName("InetSocketAddress")
+        class InetSocketAddress constructor(host: String, port: Int)
+
+        @JsName("Proxy")
+        class Proxy constructor(type: Type, address: InetSocketAddress){
+
+            @JsName("Type")
+            enum class Type {
+                DIRECT,
+                HTTP,
+                SOCKS
+            }
+        }
+
         @JsName("URLDecoder")
         class URLDecoder {
             companion object {
@@ -368,5 +382,86 @@ external class java {
 
         @JsName("FileOutputStream")
         class FileOutputStream(path: String) : OutputStream
+
+        @JsName("File")
+        class File(path: String) {
+            constructor(parent: File, child: String)
+            @JsName("getAbsolutePath")
+            fun getAbsolutePath(): String
+
+            @JsName("getPath")
+            fun getPath(): String
+
+            @JsName("exists")
+            fun exists(): Boolean
+
+            @JsName("isDirectory")
+            fun isDirectory(): Boolean
+
+            @JsName("isFile")
+            fun isFile(): Boolean
+
+            @JsName("canRead")
+            fun canRead(): Boolean
+
+            @JsName("canWrite")
+            fun canWrite(): Boolean
+
+            @JsName("length")
+            fun length(): Long
+
+            @JsName("setReadOnly")
+            fun setReadOnly()
+
+            @JsName("setLastModified")
+            fun setLastModified(time: Long): Boolean
+
+            @JsName("createNewFile")
+            fun createNewFile(): Boolean
+
+            @JsName("mkdir")
+            fun mkdir(): Boolean
+
+            @JsName("mkdirs")
+            fun mkdirs(): Boolean
+
+            @JsName("renameTo")
+            fun renameTo(dest: File): Boolean
+
+            @JsName("setWritable")
+            fun setWritable(writable: Boolean)
+
+            @JsName("setWritableWithOwnerOnly")
+            fun setWritable(writable: Boolean, ownerOnly: Boolean)
+
+            @JsName("setReadable")
+            fun setReadable(readable: Boolean)
+
+            @JsName("setReadableWithOwnerOnly")
+            fun setReadable(readable: Boolean, ownerOnly: Boolean)
+
+            @JsName("list")
+            fun list(): Array<String>?
+
+            @JsName("listFiles")
+            fun listFiles(): Array<File>?
+        }
+    }
+
+    @JsName("util")
+    class util{
+        @JsName("concurrent")
+        class concurrent{
+            @JsName("TimeUnit")
+            enum class TimeUnit{
+                NANOSECONDS,
+                MICROSECONDS,
+                MILLISECONDS,
+                SECONDS,
+                MINUTES,
+                HOURS,
+                DAYS
+            }
+        }
     }
 }

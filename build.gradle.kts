@@ -4,32 +4,46 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.incremental.deleteDirectoryContents
 import java.io.File
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
-import java.util.Properties
 
 var serverPort = 9317
 plugins {
-    kotlin("multiplatform") version "1.9.21"
-    kotlin("plugin.serialization") version "1.9.21"
-    id("maven-publish")
+    kotlin("multiplatform") version "2.0.0"
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 
-group = "com.github.autojs_kotlin_sdk"
+group = "zimoyin.github"
 version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven {
+        url = URI("https://jitpack.io")
+    }
 }
 
 kotlin {
     js(IR) {
+        // 是否使用 nodejs 的下载功能.让 gradle 去自动下载 node 到 gradle 缓存文件夹
+        rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+            rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download = true
+        }
+        // 输出模块名称
+        moduleName = "main"
+        // 设置package.json
         compilations["main"].packageJson {
             customField("scripts", mapOf("babel" to "babel kotlin -d kotlin_babel", "build" to "webpack"))
         }
-        generateTypeScriptDefinitions()
-        useEsModules()
-        nodejs()
+//        generateTypeScriptDefinitions() // 生成 TypeScript 声明文件 (d.ts)
+//        useEsModules() // 使用 ES 模块，使用后输出 mjs 文件。
+        nodejs {
+            testTask {
+                // 是否启用测试
+                enabled = true
+            }
+        }
         binaries.executable()
         taskList()
     }
@@ -37,140 +51,178 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                // Babel dependencies
+                // Babel dependencies (不使用 webpage 命令可以移除)
                 implementation(devNpm("babel-loader", "^8.1.0"))
                 implementation(devNpm("@babel/core", "^7.14.0"))
                 implementation(devNpm("@babel/cli", "^7.14.0"))
                 implementation(devNpm("@babel/preset-env", "^7.14.0"))
 
-                // Webpack dependencies
+                // Webpack dependencies (不使用 webpage 命令可以移除)
                 implementation(devNpm("webpack", "^5.0.0"))
                 implementation(devNpm("webpack-cli", "^4.0.0"))
 
-                // javascript-obfuscator
+                // javascript-obfuscator (不使用 webpage 命令可以移除)
                 implementation(devNpm("javascript-obfuscator", "^4.1.1"))
                 implementation(devNpm("webpack-obfuscator", "^3.5.1"))
 
 
                 // Kotlin dependencies
-                // Coroutines & serialization
+                // Coroutines & serialization (不使用可以移除)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+                // 不可移除!
+                implementation("com.github.zimoyin:autojs_kotlin_sdk:1.0.6")
             }
         }
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["kotlin"])
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-        }
-    }
-}
-
-val configProperties = Properties().apply {
-    load(File(rootDir, "./config/config.properties").inputStream())
-}
-val use_ui: String by configProperties
-val webpack_intermediate_files: String by configProperties
-val auto_upload: String by configProperties
-val auto_execute: String by configProperties
 
 fun KotlinJsTargetDsl.taskList() {
 
-    tasks.register("httpRunProject") {
+    val mainFile = compilations.getByName("main").npmProject.dir.get().asFile        // 编译输出文件夹
+    val mainKotlinFile = File(mainFile,"kotlin")                                       // 编译输出文件夹
+    val configFile = buildFile.parentFile.resolve("config")                         // 配置文件夹
+    val compilationFile = buildFile.parentFile.resolve("build/autojs/compilation") // 最后编译输出文件夹
+    val intermediateCompilationFile =  buildFile.parentFile.resolve("build/autojs/intermediate_compilation_files") // 最后中间编译输出文件夹
+    val intermediateCompilationMainJsFile =  File(intermediateCompilationFile, "main.js") // 最后中间编译输出文件夹
+    val compilationMainJsFile =  File(compilationFile, "main.js")                                    // 输出最后编译文件
+
+    val webpackIntermediateFiles = project.findProperty("autojs.webpack.intermediate.files") as String
+    val useUI = project.findProperty("autojs.use.ui") as String
+    val webpackAutoRun = project.findProperty("autojs.webpack.auto.run") as String
+    val webpackAutoUpload = project.findProperty("autojs.webpack.auto.upload") as String
+
+    tasks.register("run"){
         group = "autojs"
+        dependsOn("compile")
+        finalizedBy("httpRunProject")
 
         doLast {
-            val postData = buildFile.parentFile.resolve("build/autojs/compilation").canonicalPath
-
-            val connection: HttpURLConnection =
-                URL("http://127.0.0.1:$serverPort/upload_run_path").openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-            connection.doOutput = true
-            connection.setRequestProperty("Content-Type", "application/json")
-
-            // Send request
-            val os = connection.outputStream
-            os.write(postData.toByteArray())
-            os.flush()
-            os.close()
-
-            // Get Response
-            val responseCode = connection.responseCode
-            println("Response Code : $responseCode")
-            if (responseCode != 200) throw RuntimeException("Failed : HTTP error code : $responseCode")
-
-            connection.disconnect()
+            // 将编译后的文件复制到 mainPath
+            if (compilationFile.exists()) compilationFile.deleteDirectoryContents()
+            copy {
+                from(intermediateCompilationFile)
+                into(compilationFile)
+            }
+            // main.js 前面添加 "ui"; 进入UI模式
+            if (compilationMainJsFile.exists() && useUI.contains("true")) {
+                val content = compilationMainJsFile.readText()
+                val newlineIndex1 = content.indexOf("\r\n")
+                val newlineIndex2 = content.indexOf('\n')
+                var firstLine = if (newlineIndex1 == -1) null else content.substring(0, newlineIndex1)
+                firstLine = firstLine ?: if (newlineIndex2 == -1) "" else content.substring(0, newlineIndex2)
+                if (!firstLine.contains("ui") || firstLine.length > 6) {
+                    compilationMainJsFile.writeText("\"ui\";\n$content")
+                }
+            }
         }
     }
 
-    tasks.register("httpUploadResources") {
+
+    tasks.register("httpRunProject") {
         group = "autojs"
-
         doLast {
-            val postData = buildFile.parentFile.resolve("build/processedResources/js/main").canonicalPath
-
-            val connection: HttpURLConnection =
-                URL("http://127.0.0.1:$serverPort/upload_resources_path").openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-            connection.doOutput = true
-            connection.setRequestProperty("Content-Type", "application/json")
-
-            // Send request
-            val os = connection.outputStream
-            os.write(postData.toByteArray())
-            os.flush()
-            os.close()
-
-            // Get Response
-            val responseCode = connection.responseCode
-            println("Response Code : $responseCode")
-            if (responseCode != 200) throw RuntimeException("Failed : HTTP error code : $responseCode")
-
-            connection.disconnect()
+            val isEmpty = compilationFile.list().let {
+                it?.isEmpty() ?: true
+            }
+            if (!compilationFile.exists() && isEmpty){
+                throw NullPointerException("${compilationFile.canonicalPath} path is null")
+            }
+            post("http://127.0.0.1:$serverPort/upload_run_path",compilationFile.canonicalPath)
         }
     }
 
     tasks.register("httpUploadProject") {
         group = "autojs"
-
         doLast {
-            val postData = buildFile.parentFile.resolve("build/autojs/compilation").canonicalPath
+            val isEmpty = compilationFile.list().let {
+                it?.isEmpty() ?: true
+            }
+            if (!compilationFile.exists() && isEmpty){
+                throw NullPointerException("${compilationFile.canonicalPath} path is null")
+            }
+            post("http://127.0.0.1:$serverPort/upload_path",compilationFile.canonicalPath)
+        }
+    }
 
-            val connection: HttpURLConnection =
-                URL("http://127.0.0.1:$serverPort/upload_path").openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-            connection.doOutput = true
-            connection.setRequestProperty("Content-Type", "application/json")
+    tasks.register("webpack"){
+        description = "Build project with webpack"
+        group = "autojs"
 
-            // Send request
-            val os = connection.outputStream
-            os.write(postData.toByteArray())
-            os.flush()
-            os.close()
+        dependsOn("compile")
+        if (compilationMainJsFile.exists() && webpackAutoUpload.contains("true")) {
+            finalizedBy("httpUploadProject")
+        }
 
-            // Get Response
-            val responseCode = connection.responseCode
-            println("Response Code : $responseCode")
-            if (responseCode != 200) throw RuntimeException("Failed : HTTP error code : $responseCode")
+        if (compilationMainJsFile.exists() && webpackAutoRun.contains("true")) {
+            finalizedBy("httpRunProject")
+        }
 
-            connection.disconnect()
+        doLast{
+            val path = mainKotlinFile.path
+            // 复制中间编译文件回初次编译位置
+            if (webpackIntermediateFiles.contains("true")) {
+                if (mainKotlinFile.exists()) mainKotlinFile.deleteDirectoryContents()
+                copy {
+                    from(intermediateCompilationFile)
+                    into(mainKotlinFile)
+                }
+            }
+            // 移动配置文件到 build 项目文件夹下
+            copy {
+                from(configFile)
+                into(mainFile)
+            }
+
+            // 执行命令
+            exec {
+                compilations.getByName("main").npmProject.useTool(
+                    this, File(path, "..\\..\\..\\node_modules\\webpack\\bin\\webpack.js").path, emptyList(), emptyList()
+                )
+            }
+
+            // 将编译后的文件复制到 mainPath
+            if (compilationFile.exists()) compilationFile.deleteDirectoryContents()
+            copy {
+                from(mainFile.resolve("dist"))
+                into(compilationFile)
+            }
+
+            // 将编译后的文件文件夹内的文件复制到 mainPath
+            mainKotlinFile.listFiles()?.asSequence()?.filter {
+                it.name.endsWith(".js").not()
+            }?.filter {
+                it.name.endsWith(".mjs").not()
+            }?.filter {
+                it.name.endsWith(".ts").not()
+            }?.filter {
+                it.name.endsWith(".mjs.map").not()
+            }?.filter {
+                it.name.endsWith(".js.map").not()
+            }?.toList()?.forEach {
+                copy {
+                    println(it)
+                    from(it)
+                    into(compilationFile)
+                }
+            }
+
+            // main.js 前面添加 "ui"; 进入UI模式
+            if (compilationMainJsFile.exists() && useUI.contains("true")) {
+                val content = compilationMainJsFile.readText()
+                compilationMainJsFile.writeText("\"ui\";\n$content")
+            }
         }
     }
 
     tasks.register("info") {
         group = "autojs"
-        val nodeExecutable = compilations.getByName("main").npmProject.nodeJs.requireConfigured().nodeExecutable
-        val nodeDir = compilations.getByName("main").npmProject.nodeJs.requireConfigured().nodeDir
-        val nodeBinDir = compilations.getByName("main").npmProject.nodeJs.requireConfigured().nodeBinDir
+        val nodeExecutable = compilations.getByName("main").npmProject.nodeJs.requireConfigured().executable
+        val nodeDir = compilations.getByName("main").npmProject.nodeJs.requireConfigured().nodeBinDir
         val platformName = compilations.getByName("main").npmProject.nodeJs.requireConfigured().platformName
         val architectureName = compilations.getByName("main").npmProject.nodeJs.requireConfigured().architectureName
-        val path = compilations.getByName("main").npmProject.dir.path
+        val path = mainFile.path
         val mainPath = buildFile.parentFile.resolve("build/autojs")
 
         println("-----------------------------------------------------------------------------")
@@ -180,127 +232,12 @@ fun KotlinJsTargetDsl.taskList() {
         println("> Kotlin compiler type:    ${KotlinJsCompilerType.IR}")
         println("> Node executable:         $nodeExecutable")
         println("> Node directory:          $nodeDir")
-        println("> Node bin directory:      $nodeBinDir")
         println("> Build js project path:   $path")
         println("> Output path:             $mainPath")
         println("> Config:")
-        println("   > use_ui                       :$use_ui")
-        println("   > webpack_intermediate_files   :$use_ui")
-        println("   > auto_upload                  :$use_ui")
-        println("   > auto_execute                 :$use_ui")
+        println("   > use_ui                       :$useUI")
+        println("   > webpack_intermediate_files   :$webpackIntermediateFiles")
         println("-----------------------------------------------------------------------------")
-    }
-
-    tasks.register("buildMainJs") {
-        description = "Build project"
-        group = "autojs"
-        dependsOn("initEnvironment")
-        dependsOn("compileIntermediateFiles")
-
-        val path = compilations.getByName("main").npmProject.dir.path
-        val mainPath = buildFile.parentFile.resolve("build/autojs/compilation")
-        val resource = buildFile.parentFile.resolve("build/processedResources/js/main")
-        val mainJs = File(mainPath, "main.js")
-
-        if (mainJs.exists() && auto_upload.contains("true")) {
-            finalizedBy("httpUploadProject")
-        }
-
-        if (mainJs.exists() && auto_execute.contains("true")) {
-            finalizedBy("httpRunProject")
-        }
-        doLast {
-
-            exec {
-                compilations.getByName("main").npmProject.useTool(
-                    this, File(path, "..\\..\\node_modules\\webpack\\bin\\webpack.js").path, emptyList(), emptyList()
-                )
-            }
-
-            if (mainPath.exists()) mainPath.deleteDirectoryContents()
-            copy {
-                from(File(path, "build/output"))
-                into(mainPath)
-            }
-
-            // 将 resources 文件夹下的内容复制到 mainPath
-            copy {
-                from(resource)
-                into(mainPath)
-            }
-
-            // main.js 前面添加 ui; 进入UI模式
-            if (mainJs.exists() && use_ui.contains("true")) {
-                val content = mainJs.readText()
-                mainJs.writeText("\"ui\";\n$content")
-            }
-        }
-    }
-
-
-    tasks.register("webpack") {
-        description = "Build project with webpack"
-        group = "autojs"
-
-
-        val path = compilations.getByName("main").npmProject.dir.path
-        val configPath = buildFile.parentFile.resolve("config")
-        val mainPath = buildFile.parentFile.resolve("build/autojs/compilation")
-        val sourceDir = File(path, "kotlin")
-        val compilationDir = buildFile.parentFile.resolve("build/autojs/intermediate_compilation_files")
-        val resource = buildFile.parentFile.resolve("build/processedResources/js/main")
-        val mainJs = File(mainPath, "main.js")
-
-        if (mainJs.exists() && auto_upload.contains("true")) {
-            finalizedBy("httpUploadProject")
-        }
-
-        if (mainJs.exists() && auto_execute.contains("true")) {
-            finalizedBy("httpRunProject")
-        }
-
-        doFirst{
-            // 复制中间编译文件回初次编译位置
-            if (webpack_intermediate_files.contains("true")) {
-                if (sourceDir.exists()) sourceDir.deleteDirectoryContents()
-                copy {
-                    from(compilationDir)
-                    into(sourceDir)
-                }
-            }
-
-            // 移动配置文件到 build 项目文件夹下
-            copy {
-                from(configPath)
-                into(File(path))
-            }
-
-            // 执行命令
-            exec {
-                compilations.getByName("main").npmProject.useTool(
-                    this, File(path, "..\\..\\node_modules\\webpack\\bin\\webpack.js").path, emptyList(), emptyList()
-                )
-            }
-
-            // 将编译后的文件复制到 mainPath
-            if (mainPath.exists()) mainPath.deleteDirectoryContents()
-            copy {
-                from(File(path, "build/output"))
-                into(mainPath)
-            }
-
-            // 将 resources 文件夹下的内容复制到 mainPath
-            copy {
-                from(resource)
-                into(mainPath)
-            }
-
-            // main.js 前面添加 "ui"; 进入UI模式
-            if (mainJs.exists() && use_ui.contains("true")) {
-                val content = mainJs.readText()
-                mainJs.writeText("\"ui\";\n$content")
-            }
-        }
     }
 
     tasks.register("initEnvironment") {
@@ -315,12 +252,9 @@ fun KotlinJsTargetDsl.taskList() {
 
         doLast {
             // 移动配置文件到 build 项目文件夹下
-            val path = compilations.getByName("main").npmProject.dir.path
-            val configPath = buildFile.parentFile.resolve("config")
-
             copy {
-                from(configPath)
-                into(File(path))
+                from(configFile)
+                into(mainFile)
             }
         }
     }
@@ -337,30 +271,64 @@ fun KotlinJsTargetDsl.taskList() {
 
         doLast {
             // 移动配置文件到 build 项目文件夹下
-            val path = compilations.getByName("main").npmProject.dir.path
-            val configPath = buildFile.parentFile.resolve("config")
-
             copy {
-                from(configPath)
-                into(File(path))
+                from(buildFile.parentFile.resolve("config"))
+                into(mainFile)
             }
         }
     }
 
-    tasks.register<Copy>("compileIntermediateFiles") {
+    tasks.register("compile") {
         description = "Compile Autojs project"
         group = "autojs"
+        dependsOn("initEnvironment")
         dependsOn("jsPackageJson")
-        dependsOn("jsDevelopmentExecutableCompileSync")
-        dependsOn("compileDevelopmentExecutableKotlinJs")
-        val sourceDir = File(compilations.getByName("main").npmProject.dir, "kotlin")
-        val destDir = buildFile.parentFile.resolve("build/autojs/intermediate_compilation_files")
+        // 直接编译发布可运行 js 文件
+        dependsOn("jsProductionExecutableCompileSync")
+        dependsOn("compileProductionExecutableKotlinJs")
 
-        from(sourceDir)
-        into(destDir)
+        intermediateCompilationFile.deleteDirectoryContents()
 
-        doFirst {
-            destDir.deleteDirectoryContents()
+        doLast{
+            copy {
+                from(mainKotlinFile)
+                into(intermediateCompilationFile)
+            }
+            // main.js 前面添加 "ui"; 进入UI模式
+            if (compilationMainJsFile.exists() && useUI.contains("true")) {
+                val content = compilationMainJsFile.readText()
+                compilationMainJsFile.writeText("\"ui\";\n$content")
+            }
         }
     }
+
+    tasks.register("compileContinuous") {
+        dependsOn("jsPackageJson")
+        dependsOn("jsProductionExecutableCompileSync")
+        dependsOn("compileProductionExecutableKotlinJs")
+    }
+}
+
+fun post(url:String,data:String){
+    val connection: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
+    println("send data: $data")
+    connection.requestMethod = "POST"
+    connection.doOutput = true
+    connection.setRequestProperty("Content-Type", "application/json")
+
+    // Send request
+    val os = connection.outputStream
+    os.write(data.toByteArray())
+    os.flush()
+    os.close()
+
+    // Get Response
+    val responseCode = connection.responseCode
+    println("Response Code : $responseCode")
+    if (responseCode != 200){
+        val response = connection.inputStream.bufferedReader().use { it.readText() }
+        throw Exception("Response Code : $responseCode, Response: $response")
+    }
+
+    connection.disconnect()
 }

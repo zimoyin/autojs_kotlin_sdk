@@ -6,7 +6,7 @@ external object Engines {
     /**
      * 脚本引擎对象。
      */
-    interface ScriptEngine {
+    class ScriptEngine {
 
         /**
          * 停止脚本引擎的执行。
@@ -43,8 +43,53 @@ external object Engines {
          */
         fun destroyed(): Boolean
         val execArgv: String
-        val source: String
+        val source: Source
         val id: String
+
+        @JsName("source")
+        class Source{
+            @JsName("script")
+            val script:String
+
+            @JsName("name")
+            val name:String
+
+            @JsName("file")
+            val file:dynamic
+
+            @JsName("getClass")
+            fun getClass():dynamic
+
+            @JsName("wait")
+            fun wait()
+
+            @JsName("getName")
+            fun getName():String
+
+            @JsName("notifyAll")
+            fun notifyAll()
+
+            @JsName("getNonNullScriptReader")
+            fun getNonNullScriptReader():dynamic
+
+            @JsName("getFile")
+            fun getFile():dynamic
+
+            @JsName("notify")
+            fun notify()
+
+            @JsName("getEngineName")
+            fun getEngineName():String
+
+            @JsName("getScriptReader")
+            fun getScriptReader():dynamic
+
+            @JsName("getScript")
+            fun getScript():dynamic
+
+            @JsName("getExecutionMode")
+            fun getExecutionMode():String
+        }
     }
 
     /**

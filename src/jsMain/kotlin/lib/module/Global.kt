@@ -108,6 +108,7 @@ fun gesturePoint(x1: Int, y1: Int): Array<Int> {
  * 为模拟一个从(0, 0)到(500, 500)到(500, 100)的手势操作，时长为2秒。
  * @duration {number} 手势的时长
  */
+@JsName("gesture")
 external fun gesture(duration: Int, point1: Array<Int>, point2: Array<Int>, vararg points: Array<Int>): Unit
 
 sealed class Gesture {
@@ -120,7 +121,7 @@ sealed class Gesture {
 }
 
 @Deprecated("推荐使用 gesturesByKotlin，而不是原生 js 的方法")
-val gestures = js("gestures")
+external fun gestures(p:dynamic): dynamic
 
 /**
  * 同时模拟多个手势。每个手势的参数为[delay, duration, 坐标], delay为延迟多久(毫秒)才执行该手势；duration为手势执行时长；坐标为手势经过的点的坐标。其中delay参数可以省略，默认为0。
