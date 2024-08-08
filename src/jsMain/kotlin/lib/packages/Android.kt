@@ -68,4 +68,28 @@ external class android {
         @JsName("Bitmap")
         interface Bitmap
     }
+
+    @JsName("hardware")
+    class hardware{
+        @JsName("SensorEvent")
+        class SensorEvent{
+            /**
+             * accuracy {number} 表示传感器精度。
+             */
+            @JsName("accuracy")
+            val accuracy: Int
+
+            /**
+             * 如果这是不连续后的第一个传感器事件，则设置为 true。
+             */
+            @JsName("firstEventAfterDiscontinuity")
+            val firstEventAfterDiscontinuity: Boolean
+
+            /**
+             * 事件发生的时间（以纳秒为单位）。
+             */
+            @JsName("timestamp")
+            val timestamp: Long
+        }
+    }
 }

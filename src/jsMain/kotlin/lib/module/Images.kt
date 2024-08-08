@@ -1,7 +1,5 @@
 package lib.module
 
-import org.w3c.dom.Image
-
 @JsName("images")
 
 external object Images {
@@ -718,6 +716,7 @@ external interface Image {
 
     /**
      * Image对象通过调用recycle()函数来回收
+     * 注意：通过 captureScreen 获取的图片，不需要回收
      */
     fun recycle()
 }

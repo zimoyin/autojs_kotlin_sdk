@@ -8,31 +8,31 @@ package lib.module
 //TODO
 
 @Deprecated("use setTimeoutByKotlin")
-external fun setTimeout(callback: () -> Unit, delay: Int, vararg args: Any)
+external fun setTimeout(callback: () -> Unit, delay: Int, vararg args: Any): Int
 
 /**
  * 预定在 delay 毫秒之后执行的单次 callback。 返回一个用于 clearTimeout() 的 id。
  * callback 可能不会精确地在 delay 毫秒被调用。 Auto.js 不能保证回调被触发的确切时间，也不能保证它们的顺序。 回调会在尽可能接近所指定的时间上调用。
  * 当 delay 小于 0 时，delay 会被设为 0。
  */
-fun setTimeoutByKotlin(delay: Int, vararg args: Any, callback: () -> Unit) {
-    setTimeout(callback, delay, *args)
+fun setTimeoutByKotlin(delay: Int, vararg args: Any, callback: () -> Unit): Int {
+   return setTimeout(callback, delay, *args)
 }
 
-fun setTimeoutByKotlin(delay: Int, vararg args: Any) {
-    setTimeout(fun() {}, delay, *args)
+fun setTimeoutByKotlin(delay: Int, vararg args: Any): Int {
+   return setTimeout(fun() {}, delay, *args)
 }
 
 @Deprecated("use setIntervalByKotlin")
-external fun setInterval(callback: () -> Unit, delay: Int, vararg args: Any)
+external fun setInterval(callback: () -> Unit, delay: Int, vararg args: Any):Int
 
 /**
  * 预定每隔 delay 毫秒重复执行的 callback。 返回一个用于 clearInterval() 的 id。
  *
  * 当 delay 小于 0 时，delay 会被设为 0。
  */
-fun setIntervalByKotlin(delay: Int, vararg args: Any, callback: () -> Unit) {
-    setInterval(callback, delay, *args)
+fun setIntervalByKotlin(delay: Int, vararg args: Any, callback: () -> Unit): Int {
+   return setInterval(callback, delay, *args)
 }
 
 

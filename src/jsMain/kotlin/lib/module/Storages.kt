@@ -1,7 +1,8 @@
 package lib.module
 
-@JsName("storages")
+import org.w3c.dom.Storage
 
+@JsName("storages")
 external object Storages {
 
     /**
@@ -22,7 +23,8 @@ external object Storages {
 /**
  * Storage 接口，提供存储键值对的方法。
  */
-external interface Storage {
+@JsName("Storage")
+external interface LibStorage {
 
     /**
      * 获取指定键的值，如果键不存在则返回默认值。

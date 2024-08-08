@@ -251,8 +251,28 @@ class File(private val path0: String, private val child0: String? = null) {
     }
 
     companion object {
+        /**
+         * 手机目录的根目录位置, 即 手机存储的根目录，任何应用都可以访问的公共区域
+         */
+        val ROOT_SD_PATH: String
+            get() = Files.getSdcardPath()
+
+        /**
+         * 分隔符
+         */
+        val Separator: String = "/"
+
+
         fun getSdcardPath(): String {
             return Files.getSdcardPath()
+        }
+
+        fun pwd(): String {
+            return Files.cwd()
+        }
+
+        fun cwd(): String {
+            return Files.cwd()
         }
     }
 
