@@ -73,7 +73,7 @@ object UI {
         var firstLine = if (newlineIndex1 == -1) null else script.substring(0, newlineIndex1)
         firstLine = firstLine ?: if (newlineIndex2 == -1) "" else script.substring(0, newlineIndex2)
         if (!firstLine.contains("ui") || firstLine.length > 6) {
-            throw IllegalStateException("该脚本不是ui脚本，请启用 ui 模式。在 build.gradle.kts 中设置 autojs.use.ui=true")
+            throw IllegalStateException("该脚本不是ui脚本，请启用 ui 模式。在 gradle.properties 中设置 autojs.use.ui=true")
         }
     }
 
