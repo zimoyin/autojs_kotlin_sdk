@@ -265,4 +265,13 @@ external object Device {
      */
     fun cancelVibration(): Unit
 
+    /**
+     * {boolean} 返回 true|false 设备是否存储虚拟导航栏
+     */
+    fun checkDeviceHasNavigationBar():Boolean
+
+    /**
+     * {number} 返回导航栏的高度 设备虚拟导航栏的高度,可以用设备高度 减去 这个高度，再按一定比例 点击底部附件的坐标
+     */
+    fun getVirtualBarHeigh():Int
 }

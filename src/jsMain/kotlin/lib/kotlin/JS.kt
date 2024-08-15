@@ -39,5 +39,6 @@ fun loadJsFile(name: String) {
 @JsName("require")
 external fun require(path: String): dynamic
 
+
 @JsName("context")
-external val context:dynamic
+external val context: dynamic

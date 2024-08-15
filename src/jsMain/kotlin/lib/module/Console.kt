@@ -131,6 +131,7 @@ external object Console {
      * 颜色值 #AARRGGBB
      */
     fun setBackgroud(color: String)
+    fun setBackground()
 
     /**
      * maxLines {number} 最大行数 如 10 行 设置 console 显示最大行数，默认-1，不限 ，
