@@ -16,7 +16,7 @@ plugins {
 
 
 group = "com.github.autojs_kotlin_sdk"
-version = "2.0.7-SNAPSHOT"
+version = "2.0.7.fix1-SNAPSHOT"
 
 repositories {
     mavenCentral()
