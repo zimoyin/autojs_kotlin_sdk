@@ -9,7 +9,6 @@ import lib.packages.java
 import kotlin.js.json
 
 class HtmlLoaderBuilder(private val index: String) {
-    private val webView = UI.web
 
     data class PageStartedResult(val view: android.webkit.WebView, val url: String?, val favicon: dynamic)
     data class PageFinishedResult(val view: android.webkit.WebView, val url: dynamic)
@@ -20,7 +19,7 @@ class HtmlLoaderBuilder(private val index: String) {
     )
 
     data class ConsoleMessageResult(
-        val message: String,
+        val message: dynamic,
         val sourceId: String,
         val lineNumber: Int,
         val messageLevel: String
@@ -155,8 +154,8 @@ class HtmlLoaderBuilder(private val index: String) {
                     }
                 } else {
                     consoleMessageListenerList.forEach {
-                        runCatching { it(ConsoleMessageResult(msgLevel, sourceIdStr, lineNumber, msg)) }.onFailure {
-                            console.error("onConsoleMessage error: %s", it.message)
+                        runCatching { it(ConsoleMessageResult(msg,sourceIdStr, lineNumber, msgLevel)) }.onFailure {
+                            console.error("onConsoleMessage error: %s", it)
                         }
                     }
                 }
