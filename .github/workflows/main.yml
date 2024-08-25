@@ -28,4 +28,6 @@ jobs:
           git add README.md
           git status # 查看变动的文件
           git commit -m "Update download stats" || echo "No changes to commit"
-          git push
+          git push origin master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
