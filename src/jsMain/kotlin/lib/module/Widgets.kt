@@ -58,10 +58,10 @@ external interface UiSelector {
     fun scrollable(b: Boolean): UiSelector
     fun editable(b: Boolean): UiSelector
     fun multiLine(b: Boolean): UiSelector
-    fun findOne(): UiObject
-    fun findOne(timeout: Int): UiObject
-    fun findOnce(): UiObject
-    fun findOnce(i: Int): UiObject
+    fun findOne(): UiObject?
+    fun findOne(timeout: Int): UiObject?
+    fun findOnce(): UiObject?
+    fun findOnce(i: Int): UiObject?
     fun find(): UiCollection
     fun untilFind(): UiCollection
     fun exists(): Boolean
@@ -98,7 +98,7 @@ external interface UiObject {
     fun id(): String
     fun text(): String
     fun findByText(str: String): UiCollection
-    fun findOne(selector: dynamic): UiObject
+    fun findOne(selector: dynamic): UiObject?
     fun find(selector: dynamic): UiCollection
 }
 
@@ -110,7 +110,7 @@ external interface UiCollection {
     fun empty(): Boolean
     fun nonEmpty(): Boolean
     fun find(selector: dynamic): UiCollection
-    fun findOne(selector: dynamic): UiObject
+    fun findOne(selector: dynamic): UiObject?
 }
 
 // Define `UILike` interface with a method `toString` returning a `String`
@@ -158,10 +158,10 @@ external fun editable(b: Boolean): UiSelector
 external fun multiLine(b: Boolean): UiSelector
 
 // Define functions for finding UI objects and collections
-external fun findOne(): UiObject
-external fun findOne(timeout: Int): UiObject
-external fun findOnce(): UiObject
-external fun findOnce(i: Int): UiObject
+external fun findOne(): UiObject?
+external fun findOne(timeout: Int): UiObject?
+external fun findOnce(): UiObject?
+external fun findOnce(i: Int): UiObject?
 
 external fun find(): UiCollection
 external fun untilFind(): UiCollection
