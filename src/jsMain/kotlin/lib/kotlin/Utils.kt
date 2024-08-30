@@ -151,3 +151,43 @@ enum class ScreenDirection {
      */
     LANDSCAPE;
 }
+
+
+fun <T> T?.onNotNull(block: (() -> Unit) = {}): T? {
+    if (this != null) block()
+    return this
+}
+
+
+fun <T> T?.onNull(block: (() -> Unit) = {}): T? {
+    if (this == null) block()
+    return this
+}
+
+fun <T> T?.onNullThrow(msg: String = "执行失败,获取值为 null",block: (() -> Unit) = {}): T {
+    if (this == null) {
+        block()
+        throw ResultException(msg)
+    }
+    return this
+}
+
+fun Boolean.onFalse(block: (() -> Unit) = {}): Boolean {
+    if (!this) block()
+    return this
+}
+
+fun Boolean.onTrue(block: (() -> Unit) = {}): Boolean {
+    if (this) block()
+    return this
+}
+
+fun Boolean?.onFalseThrow(msg: String = "执行失败",block: (() -> Unit) = {}): Boolean {
+    if (this == null || !this) {
+        block()
+        throw ResultException(msg)
+    }
+    return this
+}
+
+class ResultException(msg: String = "result is error") : Exception(msg)
