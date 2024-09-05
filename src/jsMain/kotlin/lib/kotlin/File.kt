@@ -1,9 +1,6 @@
 package lib.kotlin
 
-import lib.module.Files
-import lib.module.PReadableTextFile
-import lib.module.ReadableTextFile
-import lib.module.WritableTextFile
+import lib.module.*
 
 /**
  *
@@ -23,7 +20,7 @@ class File(private val path0: String, private val child0: String? = null) {
                 }
             }
             return if (child == null) {
-                if (isDirectoryEmpty) path0.substring(0, path0.length - 1) else path0
+                if (isDirectoryEmpty0(path0)) path0.substring(0, path0.length - 1) else path0
             } else {
                 if (isEndWithSlash) {
                     path0.trim() + child
@@ -41,6 +38,10 @@ class File(private val path0: String, private val child0: String? = null) {
 
     val isDirectoryEmpty: Boolean
         get() = Files.isEmptyDir(path)
+
+    fun isDirectoryEmpty0(path: String): Boolean {
+        return Files.isEmptyDir(path)
+    }
 
     val absolutePath: String
         get() = Files.path(path)
