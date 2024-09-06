@@ -46,6 +46,15 @@ class File(private val path0: String, private val child0: String? = null) {
     val absolutePath: String
         get() = Files.path(path)
 
+    val name:String
+        get() = Files.getName(path)
+
+    val extension: String
+        get() = Files.getExtension(path)
+
+    val nameWithoutExtension: String
+        get() = Files.getNameWithoutExtension(path)
+
     fun join(child: String): String {
         return Files.join(path, child.trim())
     }
@@ -219,6 +228,12 @@ class File(private val path0: String, private val child0: String? = null) {
             File(path, name)
         } else {
             throw Exception("Failed to create directory $name")
+        }
+    }
+
+    fun deleteOnContents() {
+        for (listFile in this.listFiles()) {
+            listFile.delete()
         }
     }
 
