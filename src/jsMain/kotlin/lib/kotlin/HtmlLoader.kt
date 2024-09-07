@@ -23,7 +23,12 @@ class HtmlLoader @Deprecated("use HtmlLoader.create()") constructor(
     fun start() {
         UI.layout("""<webview id="web" h="*" w="*"  />""".trimIndent())
         webViewInit(UI.web)
-        UI.web.loadUrl("file://${Files.path(index.trim())}")
+        val url = index.trim().let {
+            if (it.startsWith("http://") || it.startsWith("https://") || it.startsWith("file://")) it
+            else "file://${Files.path(it)}"
+        }
+
+        UI.web.loadUrl(url)
     }
 
     @JsName("webViewInit")
@@ -35,53 +40,53 @@ class HtmlLoader @Deprecated("use HtmlLoader.create()") constructor(
 
     private fun setConfig(webView: UILib.WebView) {
         config.apply {
-             webView.getSettings().setSupportZoom(supportZoom)
-             webView.getSettings().setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture)
-             webView.getSettings().setBuiltInZoomControls(builtInZoomControls)
-             webView.getSettings().setDisplayZoomControls(displayZoomControls)
-             webView.getSettings().setAllowFileAccess(allowFileAccess)
-             webView.getSettings().setAllowContentAccess(allowContentAccess)
-             webView.getSettings().setLoadWithOverviewMode(loadWithOverviewMode)
-             webView.getSettings().setSaveFormData(saveFormData)
-             webView.getSettings().setTextZoom(textZoom)
+            webView.getSettings().setSupportZoom(supportZoom)
+            webView.getSettings().setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture)
+            webView.getSettings().setBuiltInZoomControls(builtInZoomControls)
+            webView.getSettings().setDisplayZoomControls(displayZoomControls)
+            webView.getSettings().setAllowFileAccess(allowFileAccess)
+            webView.getSettings().setAllowContentAccess(allowContentAccess)
+            webView.getSettings().setLoadWithOverviewMode(loadWithOverviewMode)
+            webView.getSettings().setSaveFormData(saveFormData)
+            webView.getSettings().setTextZoom(textZoom)
 //             webView.getSettings().setAcceptThirdPartyCookies(acceptThirdPartyCookies)
-             webView.getSettings().setUseWideViewPort(useWideViewPort)
-             webView.getSettings().setSupportMultipleWindows(supportMultipleWindows)
-             webView.getSettings().setStandardFontFamily(standardFontFamily)
-             webView.getSettings().setFixedFontFamily(fixedFontFamily)
-             webView.getSettings().setSansSerifFontFamily(sansSerifFontFamily)
-             webView.getSettings().setSerifFontFamily(serifFontFamily)
-             webView.getSettings().setCursiveFontFamily(cursiveFontFamily)
-             webView.getSettings().setFantasyFontFamily(fantasyFontFamily)
-             webView.getSettings().setMinimumFontSize(minimumFontSize)
-             webView.getSettings().setMinimumLogicalFontSize(minimumLogicalFontSize)
-             webView.getSettings().setDefaultFontSize(defaultFontSize)
-             webView.getSettings().setDefaultFixedFontSize(defaultFixedFontSize)
-             webView.getSettings().setLoadsImagesAutomatically(loadImagesAutomatically)
-             webView.getSettings().setBlockNetworkImage(blockNetworkImage)
-             webView.getSettings().setBlockNetworkLoads(blockNetworkLoads)
-             webView.getSettings().setJavaScriptEnabled(javaScriptEnabled)
-             webView.getSettings().setAllowUniversalAccessFromFileURLs(allowUniversalAccessFromFileURLs)
-             webView.getSettings().setAllowFileAccessFromFileURLs(allowFileAccessFromFileURLs)
-             webView.getSettings().setGeolocationEnabled(geolocationEnabled)
-             webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(javaScriptCanOpenWindowsAutomatically)
-             webView.getSettings().setDefaultTextEncodingName(defaultTextEncodingName)
-             webView.getSettings().setNeedInitialFocus(needInitialFocus)
-             webView.getSettings().setCacheMode(cacheMode)
-             webView.getSettings().setMixedContentMode(mixedContentMode)
+            webView.getSettings().setUseWideViewPort(useWideViewPort)
+            webView.getSettings().setSupportMultipleWindows(supportMultipleWindows)
+            webView.getSettings().setStandardFontFamily(standardFontFamily)
+            webView.getSettings().setFixedFontFamily(fixedFontFamily)
+            webView.getSettings().setSansSerifFontFamily(sansSerifFontFamily)
+            webView.getSettings().setSerifFontFamily(serifFontFamily)
+            webView.getSettings().setCursiveFontFamily(cursiveFontFamily)
+            webView.getSettings().setFantasyFontFamily(fantasyFontFamily)
+            webView.getSettings().setMinimumFontSize(minimumFontSize)
+            webView.getSettings().setMinimumLogicalFontSize(minimumLogicalFontSize)
+            webView.getSettings().setDefaultFontSize(defaultFontSize)
+            webView.getSettings().setDefaultFixedFontSize(defaultFixedFontSize)
+            webView.getSettings().setLoadsImagesAutomatically(loadImagesAutomatically)
+            webView.getSettings().setBlockNetworkImage(blockNetworkImage)
+            webView.getSettings().setBlockNetworkLoads(blockNetworkLoads)
+            webView.getSettings().setJavaScriptEnabled(javaScriptEnabled)
+            webView.getSettings().setAllowUniversalAccessFromFileURLs(allowUniversalAccessFromFileURLs)
+            webView.getSettings().setAllowFileAccessFromFileURLs(allowFileAccessFromFileURLs)
+            webView.getSettings().setGeolocationEnabled(geolocationEnabled)
+            webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(javaScriptCanOpenWindowsAutomatically)
+            webView.getSettings().setDefaultTextEncodingName(defaultTextEncodingName)
+            webView.getSettings().setNeedInitialFocus(needInitialFocus)
+            webView.getSettings().setCacheMode(cacheMode)
+            webView.getSettings().setMixedContentMode(mixedContentMode)
 
             // 设置数据库路径和缓存路径
-             webView.getSettings().databasePath = databasePath
-             webView.getSettings().appCachePath = appCachePath
+            webView.getSettings().databasePath = databasePath
+            webView.getSettings().appCachePath = appCachePath
 
             // 启用或禁用数据库和缓存功能
-             webView.getSettings().setDatabaseEnabled(databaseEnabled)
-             webView.getSettings().setAppCacheEnabled(appCacheEnabled)
-             webView.getSettings().setDomStorageEnabled(domStorageEnabled)
+            webView.getSettings().setDatabaseEnabled(databaseEnabled)
+            webView.getSettings().setAppCacheEnabled(appCacheEnabled)
+            webView.getSettings().setDomStorageEnabled(domStorageEnabled)
 
             // 设置用户代理字符串
             if (userAgentString != null) {
-                 webView.getSettings().setUserAgentString(userAgentString)
+                webView.getSettings().setUserAgentString(userAgentString)
             }
         }
     }
