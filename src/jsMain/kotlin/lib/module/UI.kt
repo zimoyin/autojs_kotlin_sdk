@@ -56,6 +56,18 @@ external object UILib {
         @JsName("getSettings")
         fun getSettings(): dynamic
 
+        @JsName("goBack")
+        fun goBack()
+
+        @JsName("canGoBack")
+        fun canGoBack(): Boolean
+
+        @JsName("canGoForward")
+        fun canGoForward(): Boolean
+
+        @JsName("goForward")
+        fun goForward()
+
         @JsName("jsBridge")
         val jsBridge: JsBridge
     }

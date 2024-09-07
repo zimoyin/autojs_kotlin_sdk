@@ -93,3 +93,6 @@ external class android {
         }
     }
 }
+
+val android.webkit.WebResourceRequest.url
+    get() = this.getUrl()

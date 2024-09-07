@@ -20,7 +20,7 @@ class HtmlLoader @Deprecated("use HtmlLoader.create()") constructor(
     private val webChromeClientListener: WebChromeClientListener,
 ) {
 
-    fun start() {
+    fun start(): HtmlLoader {
         UI.layout("""<webview id="web" h="*" w="*"  />""".trimIndent())
         webViewInit(UI.web)
         val url = index.trim().let {
@@ -29,7 +29,20 @@ class HtmlLoader @Deprecated("use HtmlLoader.create()") constructor(
         }
 
         UI.web.loadUrl(url)
+
+        return this
     }
+
+    fun goBack() = UI.web.goBack()
+
+    fun canGoBack() = UI.web.canGoBack()
+
+    fun goForward() = UI.web.goForward()
+
+    fun canGoForward() = UI.web.canGoForward()
+
+    fun loadUrl(url: String) = UI.web.loadUrl(url)
+
 
     @JsName("webViewInit")
     private fun webViewInit(webView: UILib.WebView) {

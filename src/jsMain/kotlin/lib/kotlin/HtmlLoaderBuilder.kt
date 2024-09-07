@@ -275,13 +275,13 @@ class HtmlLoaderBuilder(private val index: String) {
          */
         var loadImagesAutomatically: Boolean = true,
         /**
-         * 设置WebView是否以http、https方式访问从网络加载图片资源，默认false
+         * 设置WebView禁止以http、https方式访问从网络加载图片资源
          */
-        var blockNetworkImage: Boolean = true,
+        var blockNetworkImage: Boolean = false,
         /**
-         * 设置WebView是否从网络加载资源，Application需要设置访问网络权限，否则报异常
+         * 设置WebView禁止从网络加载资源，
          */
-        var blockNetworkLoads: Boolean = true,
+        var blockNetworkLoads: Boolean = false,
         /**
          * 设置WebView是否允许执行JavaScript脚本，默认false，不允许
          */
