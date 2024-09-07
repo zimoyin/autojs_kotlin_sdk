@@ -1,5 +1,7 @@
 package lib.module
 
+import lib.kotlin.isUIThread
+
 
 /**
  * 控制台模块提供了一个和Web浏览器中相似的用于调试的控制台。用于输出一些调试信息、中间结果等。 console模块中的一些函数也可以直接作为全局函数使用，例如log, print等。
@@ -146,7 +148,7 @@ external object Console {
  * 结束是否自动隐藏
  */
 fun Console.show(autoHide: Boolean = false) {
-    if (Thread.getName().trim() === "main") {
+    if (isUIThread()) {
         throw IllegalStateException("Prohibit the console from running in the main (UI) thread")
     }
     eval("console.show(autoHide)")
