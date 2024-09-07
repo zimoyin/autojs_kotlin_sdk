@@ -1,16 +1,16 @@
 package lib.module
 
+
 /**
  * 控制台模块提供了一个和Web浏览器中相似的用于调试的控制台。用于输出一些调试信息、中间结果等。 console模块中的一些函数也可以直接作为全局函数使用，例如log, print等。
  */
 @JsName("console") // 这里的 "console" 是假设的模块名
-
 external object Console {
     /**
      * 显示控制台。这会显示一个控制台的悬浮窗(需要悬浮窗权限)。
      * 结束是否自动隐藏
      */
-    fun show(autoHide: Boolean = definedExternally)
+//    fun show(autoHide: Boolean = definedExternally)
 
     /**
      * 隐藏控制台悬浮窗。
@@ -137,5 +137,17 @@ external object Console {
      * maxLines {number} 最大行数 如 10 行 设置 console 显示最大行数，默认-1，不限 ，
      * 超出行数系统会清空，从0开始显示 不限制，显示列表过长，android内存又不足，系统会回收console的引用，即console 将不显示。
      */
-    fun setMaxLines(maxLines : Int)
+    fun setMaxLines(maxLines: Int)
+}
+
+/**
+ * 控制台只能在工作线程中使用
+ * 显示控制台。这会显示一个控制台的悬浮窗(需要悬浮窗权限)。
+ * 结束是否自动隐藏
+ */
+fun Console.show(autoHide: Boolean = false) {
+    if (Thread.getName().trim() === "main") {
+        throw IllegalStateException("Prohibit the console from running in the main (UI) thread")
+    }
+    eval("console.show(autoHide)")
 }
