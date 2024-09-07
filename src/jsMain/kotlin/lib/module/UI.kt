@@ -76,7 +76,7 @@ external object UILib {
     val web: WebView
 }
 
-@JsName("createUILib")
+@JsName("createUILib_0")
 object UI {
     init {
         val script = Engines.myEngine().source.script
