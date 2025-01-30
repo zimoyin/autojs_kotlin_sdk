@@ -30,6 +30,10 @@ class File(private val path0: String, private val child0: String? = null) {
             }
         }
 
+    override fun toString(): String {
+        return this.path
+    }
+
     val isFile: Boolean
         get() = Files.isFile(path)
 

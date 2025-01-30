@@ -7,7 +7,7 @@ import lib.module.open
  * 请将 JS 文件放置于 resources 下
  */
 @JsName("loadJsFile")
-fun loadJsFile(name: String) {
+inline fun loadJsFile(name: String) {
     val file = open(name, "r")
     val fileContent = file.read()
     file.close()

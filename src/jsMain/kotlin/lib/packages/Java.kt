@@ -383,6 +383,7 @@ external class java {
         @JsName("FileOutputStream")
         class FileOutputStream(path: String) : OutputStream
 
+        @Deprecated("Use lib.kotlin.File instead")
         @JsName("File")
         class File(path: String) {
             constructor(parent: File, child: String)
